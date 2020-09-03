@@ -3495,7 +3495,11 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug('Run CodeScan analysis');
-            new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), analysisCompleted);
+            core.debug(core.getInput('args'));
+            new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), {
+                'sonar.organization': core.getInput('organization'),
+                'sonar.projectKey': core.getInput('projectKey')
+            }, analysisCompleted);
             core.setOutput('time', new Date().toTimeString());
         }
         catch (error) {
@@ -19400,10 +19404,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Scanner = void 0;
 const sonarqube_scanner_1 = __importDefault(__webpack_require__(731));
 class Scanner {
-    runAnalysis(serverUrl, token, callback) {
+    runAnalysis(serverUrl, token, options, callback) {
         sonarqube_scanner_1.default({
             serverUrl,
-            token
+            token,
+            options
         }, callback);
     }
 }
