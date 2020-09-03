@@ -3498,7 +3498,14 @@ function run() {
             const args = core
                 .getInput('args')
                 .split('\n')
-                .filter(x => x !== '');
+                .filter(x => x !== '')
+                .reduce(function (obj, str) {
+                const strParts = str.split('=');
+                if (strParts[0] && strParts[1]) {
+                    obj[strParts[0].replace(/\s+/g, '')] = strParts[1].trim();
+                }
+                return obj;
+            }, {});
             core.debug(JSON.stringify(Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') })));
             new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') }), analysisCompleted);
             core.setOutput('time', new Date().toTimeString());

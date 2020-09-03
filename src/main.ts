@@ -12,6 +12,14 @@ async function run(): Promise<void> {
       .getInput('args')
       .split('\n')
       .filter(x => x !== '')
+      .reduce(function (obj: {[index: string]: string}, str) {
+        const strParts = str.split('=')
+        if (strParts[0] && strParts[1]) {
+          obj[strParts[0].replace(/\s+/g, '')] = strParts[1].trim()
+        }
+        return obj
+      }, {})
+
     core.debug(
       JSON.stringify({
         ...args,
