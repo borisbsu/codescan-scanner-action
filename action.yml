@@ -2,10 +2,22 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  milliseconds: # change this
+  organization:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'CodeScan Organization Key'
+  projectKey:
+    required: true
+    description: 'CodeScan Project Key'
+  login:
+    required: true
+    description: 'CodeScan Login Key'
+  codeScanUrl:
+    required: false
+    description: 'CodeScan Cloud URL'
+    default: 'https://app.codescan.io/'
+  args:
+    required: false
+    description: 'Additional arguments to the sonarcloud scanner'
 runs:
   using: 'node12'
   main: 'dist/index.js'
