@@ -8,11 +8,23 @@ const analysisCompleted = (): void => {
 async function run(): Promise<void> {
   try {
     core.debug('Run CodeScan analysis')
-    core.debug(core.getInput('args'))
+    const args = core
+      .getInput('args')
+      .split('\n')
+      .filter(x => x !== '')
+    core.debug(
+      JSON.stringify({
+        ...args,
+        'sonar.organization': core.getInput('organization'),
+        'sonar.projectKey': core.getInput('projectKey')
+      })
+    )
+
     new Scanner().runAnalysis(
       core.getInput('codeScanUrl'),
       core.getInput('login'),
       {
+        ...args,
         'sonar.organization': core.getInput('organization'),
         'sonar.projectKey': core.getInput('projectKey')
       },

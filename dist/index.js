@@ -3495,11 +3495,12 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug('Run CodeScan analysis');
-            core.debug(core.getInput('args'));
-            new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), {
-                'sonar.organization': core.getInput('organization'),
-                'sonar.projectKey': core.getInput('projectKey')
-            }, analysisCompleted);
+            const args = core
+                .getInput('args')
+                .split('\n')
+                .filter(x => x !== '');
+            core.debug(JSON.stringify(Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') })));
+            new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') }), analysisCompleted);
             core.setOutput('time', new Date().toTimeString());
         }
         catch (error) {
