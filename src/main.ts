@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import {Scanner} from './Scanner'
 
-const analysisCompleted = () => {
+const analysisCompleted = (): void => {
   core.debug('Analysis completed')
 }
 

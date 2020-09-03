@@ -1,11 +1,7 @@
-const scanner = require('sonarqube-scanner')
+import scanner from 'sonarqube-scanner'
 
 export class Scanner {
-  public async runAnalysis(
-    serverUrl: string,
-    token: string,
-    callback: Function
-  ) {
+  runAnalysis(serverUrl: string, token: string, callback: Function): void {
     scanner(
       {
         serverUrl,
