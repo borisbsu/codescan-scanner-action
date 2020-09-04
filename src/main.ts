@@ -20,14 +20,16 @@ async function run(): Promise<void> {
         return obj
       }, {})
 
+    const options = {
+      ...args,
+      'sonar.organization': core.getInput('organization'),
+      'sonar.projectKey': core.getInput('projectKey')
+    }
+
     new Scanner().runAnalysis(
       core.getInput('codeScanUrl'),
       core.getInput('login'),
-      {
-        ...args,
-        'sonar.organization': core.getInput('organization'),
-        'sonar.projectKey': core.getInput('projectKey')
-      },
+      options,
       analysisCompleted
     )
 

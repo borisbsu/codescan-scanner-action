@@ -3500,18 +3500,14 @@ function run() {
                 .split('\n')
                 .filter(x => x !== '')
                 .reduce(function (obj, str) {
-                core.debug(str);
                 const strParts = str.split('=');
-                core.debug(strParts[0]);
-                core.debug(strParts[1]);
                 if (strParts[0] && strParts[1]) {
                     obj[strParts[0].replace(/\s+/g, '')] = strParts[1].trim();
                 }
-                core.debug(JSON.stringify(obj));
                 return obj;
             }, {});
-            core.debug(JSON.stringify(Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') })));
-            new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') }), analysisCompleted);
+            const options = Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') });
+            new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), options, analysisCompleted);
             core.setOutput('time', new Date().toTimeString());
         }
         catch (error) {
@@ -19409,14 +19405,35 @@ module.exports.windowsNames = () => (/^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i);
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Scanner = void 0;
 const sonarqube_scanner_1 = __importDefault(__webpack_require__(731));
+const core = __importStar(__webpack_require__(186));
 class Scanner {
     runAnalysis(serverUrl, token, options, callback) {
+        core.debug(`Scanner options: ${JSON.stringify(options)}`);
         sonarqube_scanner_1.default({
             serverUrl,
             token,

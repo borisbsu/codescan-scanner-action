@@ -1,4 +1,5 @@
 import scanner from 'sonarqube-scanner'
+import * as core from '@actions/core'
 
 export class Scanner {
   runAnalysis(
@@ -7,6 +8,7 @@ export class Scanner {
     options: object,
     callback: Function
   ): void {
+    core.debug(`Scanner options: ${JSON.stringify(options)}`)
     scanner(
       {
         serverUrl,
