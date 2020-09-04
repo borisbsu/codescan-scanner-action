@@ -13,24 +13,12 @@ async function run(): Promise<void> {
       .split('\n')
       .filter(x => x !== '')
       .reduce(function (obj: {[index: string]: string}, str) {
-        core.debug(str)
         const strParts = str.split('=')
-        core.debug(strParts[0])
-        core.debug(strParts[1])
         if (strParts[0] && strParts[1]) {
           obj[strParts[0].replace(/\s+/g, '')] = strParts[1].trim()
         }
-        core.debug(JSON.stringify(obj))
         return obj
       }, {})
-
-    core.debug(
-      JSON.stringify({
-        ...args,
-        'sonar.organization': core.getInput('organization'),
-        'sonar.projectKey': core.getInput('projectKey')
-      })
-    )
 
     new Scanner().runAnalysis(
       core.getInput('codeScanUrl'),
