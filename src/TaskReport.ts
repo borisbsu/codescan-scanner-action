@@ -58,7 +58,7 @@ export default class TaskReport {
     //     tl.getVariable('Agent.BuildDirectory'),
     //     taskReportGlob
     // );
-    core.debug("1");
+    core.debug("1!!");
     glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
       console.log(11, files)
     });

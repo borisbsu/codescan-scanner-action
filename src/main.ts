@@ -31,6 +31,7 @@ async function run(): Promise<void> {
         core.debug('[CS] CodeScan Analysis completed.')
 
         const taskReports = TaskReport.createTaskReportsFromFiles();
+        core.debug('FINAL: ');
         core.debug(JSON.stringify(taskReports));
         // const analyses = Promise.all(
             //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))

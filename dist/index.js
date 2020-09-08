@@ -113,11 +113,17 @@ class TaskReport {
         // );
         core.debug("1");
         glob_1.default(__dirname + '/**/' + exports.REPORT_TASK_NAME, {}, (err, files) => {
-            console.log(files);
+            console.log(11, files);
         });
         core.debug("2");
         glob_1.default(taskReportGlob, {}, (err, files) => {
-            console.log(files);
+            console.log(22, files);
+        });
+        glob_1.default(__dirname, {}, (err, files) => {
+            console.log(33, files);
+        });
+        glob_1.default(__dirname + '/*', {}, (err, files) => {
+            console.log(44, files);
         });
         core.debug("3");
         // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
@@ -235,6 +241,7 @@ function run() {
             new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), options, () => {
                 core.debug('[CS] CodeScan Analysis completed.');
                 const taskReports = TaskReport_1.default.createTaskReportsFromFiles();
+                core.debug('FINAL: ');
                 core.debug(JSON.stringify(taskReports));
                 // const analyses = Promise.all(
                 //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
