@@ -1,7 +1,8 @@
 import * as path from "path";
 import * as fs from 'fs-extra';
 import * as core from '@actions/core';
-import * as glob from '@actions/glob';
+import { Globber } from "@actions/glob";
+const glob = require('@actions/glob');
 
 export const REPORT_TASK_NAME = 'report-task.txt';
 
@@ -59,10 +60,14 @@ export default class TaskReport {
     //     taskReportGlob
     // );
     core.debug("1!!");
-    const globber = glob.create('*', {followSymbolicLinks: false})
-    globber.then(result => {
-      console.log('res!', result);
+    glob.create('*', {followSymbolicLinks: false}).then((globber:Globber) => {
+      const res = globber.glob();
+      console.log('res', res);
     })
+    // globber.then()
+    // globber.then((result) => {
+    //   console.log('res!', result);
+    // })
     core.debug("2!!");
     // const files = globber.glob()
     // core.debug("3!!");

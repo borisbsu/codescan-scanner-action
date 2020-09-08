@@ -97,7 +97,7 @@ exports.REPORT_TASK_NAME = void 0;
 const path = __importStar(__webpack_require__(5622));
 const fs = __importStar(__webpack_require__(5630));
 const core = __importStar(__webpack_require__(2186));
-const glob = __importStar(__webpack_require__(8090));
+const glob = __webpack_require__(8090);
 exports.REPORT_TASK_NAME = 'report-task.txt';
 class TaskReport {
     constructor(report) {
@@ -129,10 +129,14 @@ class TaskReport {
         //     taskReportGlob
         // );
         core.debug("1!!");
-        const globber = glob.create('*', { followSymbolicLinks: false });
-        globber.then(result => {
-            console.log('res!', result);
+        glob.create('*', { followSymbolicLinks: false }).then((globber) => {
+            const res = globber.glob();
+            console.log('res', res);
         });
+        // globber.then()
+        // globber.then((result) => {
+        //   console.log('res!', result);
+        // })
         core.debug("2!!");
         // const files = globber.glob()
         // core.debug("3!!");
