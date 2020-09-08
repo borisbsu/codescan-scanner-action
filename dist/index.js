@@ -132,6 +132,9 @@ class TaskReport {
         glob.create('*', { followSymbolicLinks: false }).then((globber) => {
             const res = globber.glob();
             console.log('res', res);
+            res.then(res2 => {
+                console.log('res2', res2);
+            });
         });
         // globber.then()
         // globber.then((result) => {
