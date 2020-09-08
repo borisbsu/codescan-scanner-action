@@ -60,11 +60,17 @@ export default class TaskReport {
     // );
     core.debug("1");
     glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
-      console.log(files)
+      console.log(11, files)
     });
     core.debug("2");
     glob(taskReportGlob, {}, (err, files)=>{
-      console.log(files)
+      console.log(22, files)
+    });
+    glob(__dirname, {}, (err, files)=>{
+      console.log(33, files)
+    });
+    glob(__dirname + '/*', {}, (err, files)=>{
+      console.log(44, files)
     });
     core.debug("3");
     // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
