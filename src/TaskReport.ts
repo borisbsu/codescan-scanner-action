@@ -60,7 +60,9 @@ export default class TaskReport {
     // );
     core.debug("1!!");
     const globber = glob.create('**', {followSymbolicLinks: false})
+    core.debug("2!!");
     const files = globber.glob()
+    core.debug("3!!");
     console.log(files)
 
     const globber2 = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
