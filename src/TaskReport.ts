@@ -2,6 +2,7 @@ import * as path from "path";
 import * as fs from 'fs-extra';
 import * as core from '@actions/core';
 import { Globber } from "@actions/glob";
+
 const glob = require('@actions/glob');
 
 export const REPORT_TASK_NAME = 'report-task.txt';
@@ -70,8 +71,11 @@ export default class TaskReport {
 
 
     const aa = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
-    .then((globber:Globber) => {
-      return Promise.resolve(globber.glob());
+    .then((globber: Globber) => {
+      return globber.glob()
+    })
+    .then((results: string[]) => {
+      return Promise.resolve(results)
     });
 
     // globber.then()

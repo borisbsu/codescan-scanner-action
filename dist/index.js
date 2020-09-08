@@ -141,7 +141,10 @@ class TaskReport {
         });
         const aa = glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false })
             .then((globber) => {
-            return Promise.resolve(globber.glob());
+            return globber.glob();
+        })
+            .then((results) => {
+            return Promise.resolve(results);
         });
         // globber.then()
         // globber.then((result) => {
