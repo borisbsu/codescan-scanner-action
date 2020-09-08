@@ -1,7 +1,6 @@
-import * as path from "path";
 import * as fs from 'fs-extra';
 import * as core from '@actions/core';
-import { Globber } from "@actions/glob";
+import Task, { TimeOutReachedError } from "./Task";
 
 const glob = require('@actions/glob');
 
@@ -26,6 +25,10 @@ export default class TaskReport {
       }
     }
     this.report = report as ITaskReport;
+  }
+
+  public get ceTaskId() {
+    return this.report.ceTaskId;
   }
 
   public static async createTaskReportsFromFiles(
@@ -55,62 +58,28 @@ export default class TaskReport {
   }
 
   public static async findTaskFileReport(): Promise<string[]> {
-    const taskReportGlob = path.join('**', REPORT_TASK_NAME);
-    // const taskReportGlobResult = tl.findMatch(
-    //     tl.getVariable('Agent.BuildDirectory'),
-    //     taskReportGlob
-    // );
-    core.debug("1!!");
-    // glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false}).then((globber:Globber) => {
-    //   const res = globber.glob();
-    //   console.log('res', res);
-    //   res.then(res2 => {
-    //     console.log('res2', res2);
-    //   })
-    // })
-
-
-    // const aa = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
-    // .then((globber: Globber) => {
-    //   return globber.glob()
-    // })
-    // .then((results: string[]) => {
-    //   return Promise.resolve(results)
-    // });
-
     const globber = await glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false});
     return globber.glob();
+  }
 
-    // globber.then()
-    // globber.then((result) => {
-    //   console.log('res!', result);
-    // })
-    // console.log("2!!", aa);
-    // const files = globber.glob()
-    // core.debug("3!!");
-    // console.log(files)
-
-    // const globber2 = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
-    // const files2 = globber2.glob()
-    // console.log(files2)
-
-    // glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
-    //   console.log(11, files)
-    // });
-    // core.debug("2");
-    // glob(taskReportGlob, {}, (err, files)=>{
-    //   console.log(22, files)
-    // });
-    // glob(__dirname, {}, (err, files)=>{
-    //   console.log(33, files)
-    // });
-    // glob(__dirname + '/*', {}, (err, files)=>{
-    //   console.log(44, files)
-    // });
-    // core.debug("3");
-    // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
-    //return taskReportGlobResult;
-    // return aa;
+  public static async getReportForTask(
+      taskReport: TaskReport,
+      codeScanUrl: string,
+      auth: string,
+      timeoutSec: number
+  ): Promise<Task> {
+    try {
+      return await Task.waitForTaskCompletion(codeScanUrl, auth, taskReport.ceTaskId, timeoutSec);
+    } catch (e) {
+      if (e instanceof TimeOutReachedError) {
+        core.warning(
+            `[CS] Task '${
+                taskReport.ceTaskId
+            }' takes too long to complete. Stopping after ${timeoutSec}s of polling. No quality gate will be displayed on build result.`
+        );
+      }
+      throw e;
+    }
   }
 
   private static parseReportFile(filePath: string): Promise<TaskReport> {

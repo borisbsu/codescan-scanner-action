@@ -13,8 +13,12 @@ inputs:
     description: 'CodeScan Login Key'
   codeScanUrl:
     required: false
-    description: 'CodeScan Cloud URL'
+    description: 'CodeScanCloud endpoint for your project'
     default: 'https://app.codescan.io/'
+  pollingTimeoutSec:
+    required: false
+    description: 'This task will poll CodeScanCloud until the analysis is completed, or until the timeout is reached'
+    default: '300'
   args:
     required: false
     description: 'Additional arguments to the sonarcloud scanner'
