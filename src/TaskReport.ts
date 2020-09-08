@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from 'fs-extra';
 import * as core from '@actions/core'
-import glob from 'glob';
+const glob = require('@actions/glob');
 
 export const REPORT_TASK_NAME = 'report-task.txt';
 
@@ -59,19 +59,27 @@ export default class TaskReport {
     //     taskReportGlob
     // );
     core.debug("1!!");
-    glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
-      console.log(11, files)
-    });
-    core.debug("2");
-    glob(taskReportGlob, {}, (err, files)=>{
-      console.log(22, files)
-    });
-    glob(__dirname, {}, (err, files)=>{
-      console.log(33, files)
-    });
-    glob(__dirname + '/*', {}, (err, files)=>{
-      console.log(44, files)
-    });
+    const globber = glob.create('**', {followSymbolicLinks: false})
+    const files = globber.glob()
+    console.log(files)
+
+    const globber2 = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
+    const files2 = globber2.glob()
+    console.log(files2)
+
+    // glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
+    //   console.log(11, files)
+    // });
+    // core.debug("2");
+    // glob(taskReportGlob, {}, (err, files)=>{
+    //   console.log(22, files)
+    // });
+    // glob(__dirname, {}, (err, files)=>{
+    //   console.log(33, files)
+    // });
+    // glob(__dirname + '/*', {}, (err, files)=>{
+    //   console.log(44, files)
+    // });
     core.debug("3");
     // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
     //return taskReportGlobResult;
