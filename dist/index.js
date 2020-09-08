@@ -43,14 +43,17 @@ exports.Scanner = void 0;
 const sonarqube_scanner_1 = __importDefault(__webpack_require__(8731));
 const core = __importStar(__webpack_require__(2186));
 class Scanner {
-    runAnalysis(serverUrl, token, options, callback) {
+    constructor() {
+        this.doScan = (options) => new Promise(resolve => sonarqube_scanner_1.default(options, resolve));
+    }
+    runAnalysis(serverUrl, token, options) {
         return __awaiter(this, void 0, void 0, function* () {
             core.debug(`[CS] Scanner options: ${JSON.stringify(options)}`);
-            sonarqube_scanner_1.default({
+            yield this.doScan({
                 serverUrl,
                 token,
                 options
-            }, callback);
+            });
         });
     }
 }
@@ -129,7 +132,7 @@ class TaskReport {
         //     taskReportGlob
         // );
         core.debug("1!!");
-        glob.create('*', { followSymbolicLinks: false }).then((globber) => {
+        glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false }).then((globber) => {
             const res = globber.glob();
             console.log('res', res);
             res.then(res2 => {
@@ -273,17 +276,50 @@ function run() {
                 return obj;
             }, {});
             const options = Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') });
-            yield new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), options, () => {
-                core.debug('[CS] CodeScan Analysis completed.');
-                const taskReports = TaskReport_1.default.createTaskReportsFromFiles().then(result => {
-                    console.log('result', result);
-                });
-                core.debug(JSON.stringify(taskReports));
-                // const analyses = Promise.all(
-                //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
-                // );
-                const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
-            });
+            yield new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), options);
+            core.debug('[CS] CodeScan Analysis completed.');
+            const taskReports = yield TaskReport_1.default.createTaskReportsFromFiles();
+            console.log('taskReports', taskReports);
+            // await new Scanner().runAnalysis(
+            //     core.getInput('codeScanUrl'),
+            //     core.getInput('login'),
+            //     options,
+            //     () => {
+            //       core.debug('[CS] CodeScan Analysis completed.')
+            //
+            //       const taskReports = TaskReport.createTaskReportsFromFiles().then(result => {
+            //         console.log('result', result);
+            //
+            //       });
+            //       core.debug(JSON.stringify(taskReports));
+            //       // const analyses = Promise.all(
+            //       //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
+            //       // );
+            //
+            //       const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
+            //
+            //     }
+            // )
+            // await new Scanner().runAnalysis(
+            //   core.getInput('codeScanUrl'),
+            //   core.getInput('login'),
+            //   options,
+            //   () => {
+            //     core.debug('[CS] CodeScan Analysis completed.')
+            //
+            //     const taskReports = TaskReport.createTaskReportsFromFiles().then(result => {
+            //       console.log('result', result);
+            //
+            //     });
+            //     core.debug(JSON.stringify(taskReports));
+            //     // const analyses = Promise.all(
+            //         //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
+            //     // );
+            //
+            //     const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
+            //
+            //   }
+            // )
         }
         catch (error) {
             core.setFailed(error.message);

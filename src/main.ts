@@ -24,25 +24,56 @@ async function run(): Promise<void> {
     }
 
     await new Scanner().runAnalysis(
-      core.getInput('codeScanUrl'),
-      core.getInput('login'),
-      options,
-      () => {
-        core.debug('[CS] CodeScan Analysis completed.')
+        core.getInput('codeScanUrl'),
+        core.getInput('login'),
+        options)
 
-        const taskReports = TaskReport.createTaskReportsFromFiles().then(result => {
-          console.log('result', result);
+    core.debug('[CS] CodeScan Analysis completed.')
 
-        });
-        core.debug(JSON.stringify(taskReports));
-        // const analyses = Promise.all(
-            //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
-        // );
+    const taskReports = await TaskReport.createTaskReportsFromFiles()
+    console.log('taskReports', taskReports)
 
-        const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
+    // await new Scanner().runAnalysis(
+    //     core.getInput('codeScanUrl'),
+    //     core.getInput('login'),
+    //     options,
+    //     () => {
+    //       core.debug('[CS] CodeScan Analysis completed.')
+    //
+    //       const taskReports = TaskReport.createTaskReportsFromFiles().then(result => {
+    //         console.log('result', result);
+    //
+    //       });
+    //       core.debug(JSON.stringify(taskReports));
+    //       // const analyses = Promise.all(
+    //       //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
+    //       // );
+    //
+    //       const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
+    //
+    //     }
+    // )
 
-      }
-    )
+    // await new Scanner().runAnalysis(
+    //   core.getInput('codeScanUrl'),
+    //   core.getInput('login'),
+    //   options,
+    //   () => {
+    //     core.debug('[CS] CodeScan Analysis completed.')
+    //
+    //     const taskReports = TaskReport.createTaskReportsFromFiles().then(result => {
+    //       console.log('result', result);
+    //
+    //     });
+    //     core.debug(JSON.stringify(taskReports));
+    //     // const analyses = Promise.all(
+    //         //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
+    //     // );
+    //
+    //     const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
+    //
+    //   }
+    // )
   } catch (error) {
     core.setFailed(error.message)
   }

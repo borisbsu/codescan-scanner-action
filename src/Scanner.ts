@@ -3,20 +3,23 @@ import * as core from '@actions/core'
 
 export class Scanner {
 
+  readonly doScan = (options:object) => new Promise(resolve => scanner(
+      options,
+      resolve
+  ));
+
   async runAnalysis(
     serverUrl: string,
     token: string,
-    options: object,
-    callback: Function
+    options: object
   ) {
     core.debug(`[CS] Scanner options: ${JSON.stringify(options)}`)
-    scanner(
+    await this.doScan(
       {
         serverUrl,
         token,
         options
-      },
-      callback
+      }
     )
   }
 }

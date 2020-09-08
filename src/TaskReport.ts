@@ -60,7 +60,7 @@ export default class TaskReport {
     //     taskReportGlob
     // );
     core.debug("1!!");
-    glob.create('*', {followSymbolicLinks: false}).then((globber:Globber) => {
+    glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false}).then((globber:Globber) => {
       const res = globber.glob();
       console.log('res', res);
       res.then(res2 => {
