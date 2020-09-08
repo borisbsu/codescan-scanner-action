@@ -139,11 +139,15 @@ class TaskReport {
                 console.log('res2', res2);
             });
         });
+        const aa = glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false })
+            .then((globber) => {
+            return globber.glob();
+        });
         // globber.then()
         // globber.then((result) => {
         //   console.log('res!', result);
         // })
-        core.debug("2!!");
+        console.log("2!!", aa);
         // const files = globber.glob()
         // core.debug("3!!");
         // console.log(files)
@@ -166,7 +170,7 @@ class TaskReport {
         core.debug("3");
         // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
         //return taskReportGlobResult;
-        return [];
+        return aa;
     }
     static parseReportFile(filePath) {
         return fs.readFile(filePath, 'utf-8').then(fileContent => {

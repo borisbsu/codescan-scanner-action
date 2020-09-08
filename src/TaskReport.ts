@@ -67,11 +67,18 @@ export default class TaskReport {
         console.log('res2', res2);
       })
     })
+
+
+    const aa = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
+    .then((globber:Globber) => {
+      return globber.glob();
+    });
+
     // globber.then()
     // globber.then((result) => {
     //   console.log('res!', result);
     // })
-    core.debug("2!!");
+    console.log("2!!", aa);
     // const files = globber.glob()
     // core.debug("3!!");
     // console.log(files)
@@ -96,7 +103,7 @@ export default class TaskReport {
     core.debug("3");
     // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
     //return taskReportGlobResult;
-    return [];
+    return aa;
   }
 
   private static parseReportFile(filePath: string): Promise<TaskReport> {
