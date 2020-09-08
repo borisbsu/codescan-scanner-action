@@ -26,6 +26,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -35,14 +44,14 @@ const sonarqube_scanner_1 = __importDefault(__webpack_require__(8731));
 const core = __importStar(__webpack_require__(2186));
 class Scanner {
     runAnalysis(serverUrl, token, options, callback) {
-        core.debug(`[CS] Scanner options: ${JSON.stringify(options)}`);
-        sonarqube_scanner_1.default({
-            serverUrl,
-            token,
-            options
-        }, callback);
-    }
-    waitForTaskCompletion() {
+        return __awaiter(this, void 0, void 0, function* () {
+            core.debug(`[CS] Scanner options: ${JSON.stringify(options)}`);
+            sonarqube_scanner_1.default({
+                serverUrl,
+                token,
+                options
+            }, callback);
+        });
     }
 }
 exports.Scanner = Scanner;
@@ -74,12 +83,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.REPORT_TASK_NAME = void 0;
 const path = __importStar(__webpack_require__(5622));
 const fs = __importStar(__webpack_require__(5630));
 const core = __importStar(__webpack_require__(2186));
-const glob = __webpack_require__(8090);
+const glob = __importStar(__webpack_require__(8090));
 exports.REPORT_TASK_NAME = 'report-task.txt';
 class TaskReport {
     constructor(report) {
@@ -91,16 +109,18 @@ class TaskReport {
         this.report = report;
     }
     static createTaskReportsFromFiles(filePaths = TaskReport.findTaskFileReport()) {
-        return Promise.all(filePaths.map(filePath => {
-            if (!filePath) {
-                return Promise.reject(TaskReport.throwInvalidReport(`[CS] Could not find '${exports.REPORT_TASK_NAME}'.` +
-                    ` Possible cause: the analysis did not complete successfully.`));
-            }
-            core.debug(`[CS] Read Task report file: ${filePath}`);
-            return fs.access(filePath, fs.constants.R_OK).then(() => this.parseReportFile(filePath), () => {
-                return Promise.reject(TaskReport.throwInvalidReport(`[CS] Task report not found at: ${filePath}`));
-            });
-        }));
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.all(filePaths.map(filePath => {
+                if (!filePath) {
+                    return Promise.reject(TaskReport.throwInvalidReport(`[CS] Could not find '${exports.REPORT_TASK_NAME}'.` +
+                        ` Possible cause: the analysis did not complete successfully.`));
+                }
+                core.debug(`[CS] Read Task report file: ${filePath}`);
+                return fs.access(filePath, fs.constants.R_OK).then(() => this.parseReportFile(filePath), () => {
+                    return Promise.reject(TaskReport.throwInvalidReport(`[CS] Task report not found at: ${filePath}`));
+                });
+            }));
+        });
     }
     static findTaskFileReport() {
         const taskReportGlob = path.join('**', exports.REPORT_TASK_NAME);
@@ -109,14 +129,17 @@ class TaskReport {
         //     taskReportGlob
         // );
         core.debug("1!!");
-        const globber = glob.create('**', { followSymbolicLinks: false });
+        const globber = glob.create('*', { followSymbolicLinks: false });
+        globber.then(result => {
+            console.log('res!', result);
+        });
         core.debug("2!!");
-        const files = globber.glob();
-        core.debug("3!!");
-        console.log(files);
-        const globber2 = glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false });
-        const files2 = globber2.glob();
-        console.log(files2);
+        // const files = globber.glob()
+        // core.debug("3!!");
+        // console.log(files)
+        // const globber2 = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
+        // const files2 = globber2.glob()
+        // console.log(files2)
         // glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
         //   console.log(11, files)
         // });
@@ -243,9 +266,11 @@ function run() {
                 return obj;
             }, {});
             const options = Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') });
-            new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), options, () => {
+            yield new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), options, () => {
                 core.debug('[CS] CodeScan Analysis completed.');
-                const taskReports = TaskReport_1.default.createTaskReportsFromFiles();
+                const taskReports = TaskReport_1.default.createTaskReportsFromFiles().then(result => {
+                    console.log('result', result);
+                });
                 core.debug(JSON.stringify(taskReports));
                 // const analyses = Promise.all(
                 //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))

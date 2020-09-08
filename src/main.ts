@@ -23,14 +23,17 @@ async function run(): Promise<void> {
       'sonar.projectKey': core.getInput('projectKey')
     }
 
-    new Scanner().runAnalysis(
+    await new Scanner().runAnalysis(
       core.getInput('codeScanUrl'),
       core.getInput('login'),
       options,
       () => {
         core.debug('[CS] CodeScan Analysis completed.')
 
-        const taskReports = TaskReport.createTaskReportsFromFiles();
+        const taskReports = TaskReport.createTaskReportsFromFiles().then(result => {
+          console.log('result', result);
+
+        });
         core.debug(JSON.stringify(taskReports));
         // const analyses = Promise.all(
             //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))

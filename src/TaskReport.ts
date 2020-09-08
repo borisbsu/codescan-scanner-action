@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from 'fs-extra';
-import * as core from '@actions/core'
-const glob = require('@actions/glob');
+import * as core from '@actions/core';
+import * as glob from '@actions/glob';
 
 export const REPORT_TASK_NAME = 'report-task.txt';
 
@@ -26,7 +26,7 @@ export default class TaskReport {
     this.report = report as ITaskReport;
   }
 
-  public static createTaskReportsFromFiles(
+  public static async createTaskReportsFromFiles(
       filePaths = TaskReport.findTaskFileReport()
   ): Promise<TaskReport[]> {
     return Promise.all(
@@ -59,15 +59,18 @@ export default class TaskReport {
     //     taskReportGlob
     // );
     core.debug("1!!");
-    const globber = glob.create('**', {followSymbolicLinks: false})
+    const globber = glob.create('*', {followSymbolicLinks: false})
+    globber.then(result => {
+      console.log('res!', result);
+    })
     core.debug("2!!");
-    const files = globber.glob()
-    core.debug("3!!");
-    console.log(files)
+    // const files = globber.glob()
+    // core.debug("3!!");
+    // console.log(files)
 
-    const globber2 = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
-    const files2 = globber2.glob()
-    console.log(files2)
+    // const globber2 = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
+    // const files2 = globber2.glob()
+    // console.log(files2)
 
     // glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
     //   console.log(11, files)

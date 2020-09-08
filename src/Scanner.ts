@@ -3,12 +3,12 @@ import * as core from '@actions/core'
 
 export class Scanner {
 
-  runAnalysis(
+  async runAnalysis(
     serverUrl: string,
     token: string,
     options: object,
     callback: Function
-  ): void {
+  ) {
     core.debug(`[CS] Scanner options: ${JSON.stringify(options)}`)
     scanner(
       {
@@ -18,11 +18,5 @@ export class Scanner {
       },
       callback
     )
-  }
-
-  waitForTaskCompletion(
-
-  ): void {
-
   }
 }
