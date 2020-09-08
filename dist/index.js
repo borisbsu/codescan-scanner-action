@@ -111,7 +111,7 @@ class TaskReport {
         }
         this.report = report;
     }
-    static createTaskReportsFromFiles(filePaths = TaskReport.findTaskFileReport()) {
+    static createTaskReportsFromFiles(filePaths) {
         return __awaiter(this, void 0, void 0, function* () {
             return Promise.all(filePaths.map(filePath => {
                 if (!filePath) {
@@ -126,54 +126,58 @@ class TaskReport {
         });
     }
     static findTaskFileReport() {
-        const taskReportGlob = path.join('**', exports.REPORT_TASK_NAME);
-        // const taskReportGlobResult = tl.findMatch(
-        //     tl.getVariable('Agent.BuildDirectory'),
-        //     taskReportGlob
-        // );
-        core.debug("1!!");
-        glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false }).then((globber) => {
-            const res = globber.glob();
-            console.log('res', res);
-            res.then(res2 => {
-                console.log('res2', res2);
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            const taskReportGlob = path.join('**', exports.REPORT_TASK_NAME);
+            // const taskReportGlobResult = tl.findMatch(
+            //     tl.getVariable('Agent.BuildDirectory'),
+            //     taskReportGlob
+            // );
+            core.debug("1!!");
+            // glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false}).then((globber:Globber) => {
+            //   const res = globber.glob();
+            //   console.log('res', res);
+            //   res.then(res2 => {
+            //     console.log('res2', res2);
+            //   })
+            // })
+            // const aa = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
+            // .then((globber: Globber) => {
+            //   return globber.glob()
+            // })
+            // .then((results: string[]) => {
+            //   return Promise.resolve(results)
+            // });
+            const globber = yield glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false });
+            return yield globber.glog();
+            // globber.then()
+            // globber.then((result) => {
+            //   console.log('res!', result);
+            // })
+            // console.log("2!!", aa);
+            // const files = globber.glob()
+            // core.debug("3!!");
+            // console.log(files)
+            // const globber2 = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
+            // const files2 = globber2.glob()
+            // console.log(files2)
+            // glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
+            //   console.log(11, files)
+            // });
+            // core.debug("2");
+            // glob(taskReportGlob, {}, (err, files)=>{
+            //   console.log(22, files)
+            // });
+            // glob(__dirname, {}, (err, files)=>{
+            //   console.log(33, files)
+            // });
+            // glob(__dirname + '/*', {}, (err, files)=>{
+            //   console.log(44, files)
+            // });
+            // core.debug("3");
+            // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
+            //return taskReportGlobResult;
+            // return aa;
         });
-        const aa = glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false })
-            .then((globber) => {
-            return globber.glob();
-        })
-            .then((results) => {
-            return Promise.resolve(results);
-        });
-        // globber.then()
-        // globber.then((result) => {
-        //   console.log('res!', result);
-        // })
-        console.log("2!!", aa);
-        // const files = globber.glob()
-        // core.debug("3!!");
-        // console.log(files)
-        // const globber2 = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
-        // const files2 = globber2.glob()
-        // console.log(files2)
-        // glob(__dirname + '/**/' + REPORT_TASK_NAME, {}, (err, files)=>{
-        //   console.log(11, files)
-        // });
-        // core.debug("2");
-        // glob(taskReportGlob, {}, (err, files)=>{
-        //   console.log(22, files)
-        // });
-        // glob(__dirname, {}, (err, files)=>{
-        //   console.log(33, files)
-        // });
-        // glob(__dirname + '/*', {}, (err, files)=>{
-        //   console.log(44, files)
-        // });
-        core.debug("3");
-        // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
-        //return taskReportGlobResult;
-        return aa;
     }
     static parseReportFile(filePath) {
         return fs.readFile(filePath, 'utf-8').then(fileContent => {
@@ -285,7 +289,9 @@ function run() {
             const options = Object.assign(Object.assign({}, args), { 'sonar.organization': core.getInput('organization'), 'sonar.projectKey': core.getInput('projectKey') });
             yield new Scanner_1.Scanner().runAnalysis(core.getInput('codeScanUrl'), core.getInput('login'), options);
             core.debug('[CS] CodeScan Analysis completed.');
-            const taskReports = yield TaskReport_1.default.createTaskReportsFromFiles();
+            const reportFiles = yield TaskReport_1.default.findTaskFileReport();
+            console.log('reportFiles', reportFiles);
+            const taskReports = yield TaskReport_1.default.createTaskReportsFromFiles(reportFiles);
             console.log('taskReports', taskReports);
             // await new Scanner().runAnalysis(
             //     core.getInput('codeScanUrl'),

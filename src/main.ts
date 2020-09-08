@@ -30,7 +30,9 @@ async function run(): Promise<void> {
 
     core.debug('[CS] CodeScan Analysis completed.')
 
-    const taskReports = await TaskReport.createTaskReportsFromFiles()
+    const reportFiles = await TaskReport.findTaskFileReport();
+    console.log('reportFiles', reportFiles)
+    const taskReports = await TaskReport.createTaskReportsFromFiles(reportFiles)
     console.log('taskReports', taskReports)
 
     // await new Scanner().runAnalysis(

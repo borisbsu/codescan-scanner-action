@@ -29,7 +29,7 @@ export default class TaskReport {
   }
 
   public static async createTaskReportsFromFiles(
-      filePaths = TaskReport.findTaskFileReport()
+      filePaths:string[]
   ): Promise<TaskReport[]> {
     return Promise.all(
         filePaths.map(filePath => {
@@ -54,35 +54,38 @@ export default class TaskReport {
     );
   }
 
-  private static findTaskFileReport(): string[] {
+  public static async findTaskFileReport(): Promise<string[]> {
     const taskReportGlob = path.join('**', REPORT_TASK_NAME);
     // const taskReportGlobResult = tl.findMatch(
     //     tl.getVariable('Agent.BuildDirectory'),
     //     taskReportGlob
     // );
     core.debug("1!!");
-    glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false}).then((globber:Globber) => {
-      const res = globber.glob();
-      console.log('res', res);
-      res.then(res2 => {
-        console.log('res2', res2);
-      })
-    })
+    // glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false}).then((globber:Globber) => {
+    //   const res = globber.glob();
+    //   console.log('res', res);
+    //   res.then(res2 => {
+    //     console.log('res2', res2);
+    //   })
+    // })
 
 
-    const aa = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
-    .then((globber: Globber) => {
-      return globber.glob()
-    })
-    .then((results: string[]) => {
-      return Promise.resolve(results)
-    });
+    // const aa = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
+    // .then((globber: Globber) => {
+    //   return globber.glob()
+    // })
+    // .then((results: string[]) => {
+    //   return Promise.resolve(results)
+    // });
+
+    const globber = await glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false});
+    return await globber.glog();
 
     // globber.then()
     // globber.then((result) => {
     //   console.log('res!', result);
     // })
-    console.log("2!!", aa);
+    // console.log("2!!", aa);
     // const files = globber.glob()
     // core.debug("3!!");
     // console.log(files)
@@ -104,10 +107,10 @@ export default class TaskReport {
     // glob(__dirname + '/*', {}, (err, files)=>{
     //   console.log(44, files)
     // });
-    core.debug("3");
+    // core.debug("3");
     // core.debug(`[CS] Searching for ${taskReportGlob} - found ${taskReportGlobResult.length} file(s)`);
     //return taskReportGlobResult;
-    return aa;
+    // return aa;
   }
 
   private static parseReportFile(filePath: string): Promise<TaskReport> {
