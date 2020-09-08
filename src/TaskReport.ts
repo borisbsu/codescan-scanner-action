@@ -71,7 +71,7 @@ export default class TaskReport {
 
     const aa = glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false})
     .then((globber:Globber) => {
-      return globber.glob();
+      return Promise.resolve(globber.glob());
     });
 
     // globber.then()
