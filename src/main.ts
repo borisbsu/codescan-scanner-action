@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import { Scanner } from './Scanner'
-import TaskReport from "./TaskReport";
+import TaskReport, { REPORT_TASK_NAME } from "./TaskReport";
 import Request from "./Request";
 import * as fs from "fs";
 
@@ -33,19 +33,21 @@ async function run(): Promise<void> {
     core.debug('[CS] CodeScan Analysis completed.');
 
     const reportFiles = await TaskReport.findTaskFileReport();
-    console.log('reportFiles', reportFiles);
+    core.debug(`[SQ] Searching for ${REPORT_TASK_NAME} - found ${reportFiles.length} file(s)`);
+
     const taskReports = await TaskReport.createTaskReportsFromFiles(reportFiles);
-    console.log('taskReports', taskReports);
     const tasks = await Promise.all(
         taskReports.map(taskReport => TaskReport.getReportForTask(taskReport, codeScanUrl, authToken, timeoutSec))
     );
-    console.log('tasks', tasks);
+    core.debug('[CS] CodeScan Report Tasks execution completed.');
+
+    // We should always have single task, so it's enough to hardcode SERIF filename as codescan.sarif.
     await Promise.all(
-        taskReports.map(taskReport => {
-          core.debug('[CS] Downloading SARIF report for ' + taskReport.ceTaskId);
-          Request.get(codeScanUrl, authToken, '/_codescan/reports/sarif/' + taskReport.ceTaskId, false).then(data => {
+        tasks.map(task => {
+          core.debug('[CS] Downloading SARIF file for Report Task: ' + task.id);
+          Request.get(codeScanUrl, authToken, '/_codescan/reports/sarif/' + task.id, false).then(data => {
             fs.writeFile('codescan.sarif', data, () => {
-              core.debug('[CS] The codescan.sarif file saved')
+              core.debug('[CS] The SARIF file with CodeScan analysis results has been saved')
             });
           });
         })

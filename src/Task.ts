@@ -2,17 +2,33 @@ import * as core from '@actions/core';
 import Request from "./Request";
 
 interface ITask {
-  analysisId: string;
-  componentKey: string;
-  organization?: string;
-  status: string;
-  errorMessage?: string;
-  type: string;
-  componentName: string;
+  id: string
+  type: string
+  componentId: string
+  componentKey: string
+  componentName: string
+  componentQualifier: string
+  analysisId: string
+  status: string
+  submittedAt: string
+  startedAt: string
+  executedAt: string
+  executionTimeMs: number
+  submitterLogin?: string
+  logs?: boolean
+  hasScannerContext?: boolean
+  organization?: string
+  warningCount?: number
+  warnings?: string[]
+  errorMessage?: string
 }
 
 export default class Task {
   constructor(private readonly task: ITask) {
+  }
+
+  public get id() {
+    return this.task.id;
   }
 
   public static waitForTaskCompletion(

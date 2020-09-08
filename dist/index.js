@@ -160,6 +160,9 @@ class Task {
     constructor(task) {
         this.task = task;
     }
+    get id() {
+        return this.task.id;
+    }
     static waitForTaskCompletion(codeScanUrl, authToken, taskId, tries, delay = 1000) {
         core.debug(`[CS] Waiting for task '${taskId}' to complete.`);
         return Request_1.default.get(codeScanUrl, authToken, `/api/ce/task`, true, { id: taskId }).then(({ task }) => {
@@ -381,7 +384,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(2186));
 const Scanner_1 = __webpack_require__(9660);
-const TaskReport_1 = __importDefault(__webpack_require__(1592));
+const TaskReport_1 = __importStar(__webpack_require__(1592));
 const Request_1 = __importDefault(__webpack_require__(7457));
 const fs = __importStar(__webpack_require__(5747));
 function run() {
@@ -406,59 +409,19 @@ function run() {
             yield new Scanner_1.Scanner().runAnalysis(codeScanUrl, authToken, options);
             core.debug('[CS] CodeScan Analysis completed.');
             const reportFiles = yield TaskReport_1.default.findTaskFileReport();
-            console.log('reportFiles', reportFiles);
+            core.debug(`[SQ] Searching for ${TaskReport_1.REPORT_TASK_NAME} - found ${reportFiles.length} file(s)`);
             const taskReports = yield TaskReport_1.default.createTaskReportsFromFiles(reportFiles);
-            console.log('taskReports', taskReports);
             const tasks = yield Promise.all(taskReports.map(taskReport => TaskReport_1.default.getReportForTask(taskReport, codeScanUrl, authToken, timeoutSec)));
-            console.log('tasks', tasks);
-            yield Promise.all(taskReports.map(taskReport => {
-                core.debug('[CS] Downloading SARIF report for ' + taskReport.ceTaskId);
-                Request_1.default.get(codeScanUrl, authToken, '/_codescan/reports/sarif/' + taskReport.ceTaskId, false).then(data => {
+            core.debug('[CS] CodeScan Report Tasks execution completed.');
+            // We should always have single task, so it's enough to hardcode SERIF filename as codescan.sarif.
+            yield Promise.all(tasks.map(task => {
+                core.debug('[CS] Downloading SARIF file for Report Task: ' + task.id);
+                Request_1.default.get(codeScanUrl, authToken, '/_codescan/reports/sarif/' + task.id, false).then(data => {
                     fs.writeFile('codescan.sarif', data, () => {
-                        core.debug('[CS] The codescan.sarif file saved');
+                        core.debug('[CS] The SARIF file with CodeScan analysis results has been saved');
                     });
                 });
             }));
-            // await new Scanner().runAnalysis(
-            //     core.getInput('codeScanUrl'),
-            //     core.getInput('login'),
-            //     options,
-            //     () => {
-            //       core.debug('[CS] CodeScan Analysis completed.')
-            //
-            //       const taskReports = TaskReport.createTaskReportsFromFiles().then(result => {
-            //         console.log('result', result);
-            //
-            //       });
-            //       core.debug(JSON.stringify(taskReports));
-            //       // const analyses = Promise.all(
-            //       //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
-            //       // );
-            //
-            //       const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
-            //
-            //     }
-            // )
-            // await new Scanner().runAnalysis(
-            //   core.getInput('codeScanUrl'),
-            //   core.getInput('login'),
-            //   options,
-            //   () => {
-            //     core.debug('[CS] CodeScan Analysis completed.')
-            //
-            //     const taskReports = TaskReport.createTaskReportsFromFiles().then(result => {
-            //       console.log('result', result);
-            //
-            //     });
-            //     core.debug(JSON.stringify(taskReports));
-            //     // const analyses = Promise.all(
-            //         //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
-            //     // );
-            //
-            //     const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
-            //
-            //   }
-            // )
         }
         catch (error) {
             core.setFailed(error.message);
