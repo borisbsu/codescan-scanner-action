@@ -1,13 +1,10 @@
 import * as core from '@actions/core'
 import {Scanner} from './Scanner'
-
-const analysisCompleted = (): void => {
-  core.debug('Analysis completed')
-}
+import TaskReport from "./TaskReport";
 
 async function run(): Promise<void> {
   try {
-    core.debug('Run CodeScan analysis')
+    core.debug('[CS] Run CodeScan Analysis')
     const args = core
       .getInput('args')
       .split('\n')
@@ -30,10 +27,19 @@ async function run(): Promise<void> {
       core.getInput('codeScanUrl'),
       core.getInput('login'),
       options,
-      analysisCompleted
-    )
+      () => {
+        core.debug('[CS] CodeScan Analysis completed.')
 
-    core.setOutput('time', new Date().toTimeString())
+        const taskReports = TaskReport.createTaskReportsFromFiles();
+        core.debug(JSON.stringify(taskReports));
+        // const analyses = Promise.all(
+            //taskReports.map(taskReport => getReportForTask(taskReport, metrics, endpoint, timeoutSec))
+        // );
+
+        const sarifUrl = 'http://localhost/_codescan/reports/sarif/AXRq7kfV7ezGAhxNpad-';
+
+      }
+    )
   } catch (error) {
     core.setFailed(error.message)
   }
