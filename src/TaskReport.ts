@@ -79,7 +79,7 @@ export default class TaskReport {
     // });
 
     const globber = await glob.create('**/' + REPORT_TASK_NAME, {followSymbolicLinks: false});
-    return await globber.glog();
+    return globber.glob();
 
     // globber.then()
     // globber.then((result) => {

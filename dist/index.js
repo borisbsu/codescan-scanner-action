@@ -148,7 +148,7 @@ class TaskReport {
             //   return Promise.resolve(results)
             // });
             const globber = yield glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false });
-            return yield globber.glog();
+            return globber.glob();
             // globber.then()
             // globber.then((result) => {
             //   console.log('res!', result);
