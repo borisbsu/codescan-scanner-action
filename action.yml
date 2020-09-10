@@ -19,6 +19,10 @@ inputs:
     required: false
     description: 'This task will poll CodeScanCloud until the analysis is completed, or until the timeout is reached'
     default: '300'
+  generateSarifFile:
+    required: false
+    description: 'The flag to indicate that SARIF file should be generated'
+    default: 'true'
   args:
     required: false
     description: 'Additional arguments to the sonarcloud scanner'

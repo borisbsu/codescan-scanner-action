@@ -406,6 +406,13 @@ function run() {
             const codeScanUrl = core.getInput('codeScanUrl');
             const authToken = core.getInput('login');
             const timeoutSec = Number.parseInt(core.getInput('pollingTimeoutSec'), 10);
+            const generateSarifFile = core.getInput('generateSarifFile') === 'true';
+            if (generateSarifFile) {
+                Object.assign(options, {
+                    'sonar.analysis.report.enabled': true,
+                    'sonar.analysis.report.type': 'sarif'
+                });
+            }
             yield new Scanner_1.Scanner().runAnalysis(codeScanUrl, authToken, options);
             core.debug('[CS] CodeScan Analysis completed.');
             const reportFiles = yield TaskReport_1.default.findTaskFileReport();
@@ -413,15 +420,23 @@ function run() {
             const taskReports = yield TaskReport_1.default.createTaskReportsFromFiles(reportFiles);
             const tasks = yield Promise.all(taskReports.map(taskReport => TaskReport_1.default.getReportForTask(taskReport, codeScanUrl, authToken, timeoutSec)));
             core.debug('[CS] CodeScan Report Tasks execution completed.');
-            // We should always have single task, so it's enough to hardcode SERIF filename as codescan.sarif.
-            yield Promise.all(tasks.map(task => {
-                core.debug('[CS] Downloading SARIF file for Report Task: ' + task.id);
-                Request_1.default.get(codeScanUrl, authToken, '/_codescan/reports/sarif/' + task.id, false).then(data => {
-                    fs.writeFile('codescan.sarif', data, () => {
-                        core.debug('[CS] The SARIF file with CodeScan analysis results has been saved');
+            if (generateSarifFile) {
+                // We should always have single task, so it's enough to hardcode SERIF filename as codescan.sarif.
+                yield Promise.all(tasks.map(task => {
+                    core.debug('[CS] Downloading SARIF file for Report Task: ' + task.id);
+                    Request_1.default.get(codeScanUrl, authToken, '/_codescan/analysis/reports/' + task.id, false, {
+                        'format': 'sarif',
+                        'projectKey': core.getInput('projectKey')
+                    }).then(data => {
+                        fs.writeFile('codescan.sarif', data, () => {
+                            core.debug('[CS] The SARIF file with CodeScan analysis results has been saved');
+                        });
                     });
-                });
-            }));
+                }));
+            }
+            else {
+                core.debug('[CS] Generation of SARIF file is disabled.');
+            }
         }
         catch (error) {
             core.setFailed(error.message);

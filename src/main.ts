@@ -28,6 +28,14 @@ async function run(): Promise<void> {
     const codeScanUrl = core.getInput('codeScanUrl');
     const authToken = core.getInput('login');
     const timeoutSec = Number.parseInt(core.getInput('pollingTimeoutSec'), 10);
+    const generateSarifFile = core.getInput('generateSarifFile') === 'true';
+
+    if (generateSarifFile) {
+      Object.assign(options, {
+        'sonar.analysis.report.enabled': true,
+        'sonar.analysis.report.type': 'sarif'
+      });
+    }
 
     await new Scanner().runAnalysis(codeScanUrl, authToken, options);
     core.debug('[CS] CodeScan Analysis completed.');
@@ -41,17 +49,24 @@ async function run(): Promise<void> {
     );
     core.debug('[CS] CodeScan Report Tasks execution completed.');
 
-    // We should always have single task, so it's enough to hardcode SERIF filename as codescan.sarif.
-    await Promise.all(
-        tasks.map(task => {
-          core.debug('[CS] Downloading SARIF file for Report Task: ' + task.id);
-          Request.get(codeScanUrl, authToken, '/_codescan/reports/sarif/' + task.id, false).then(data => {
-            fs.writeFile('codescan.sarif', data, () => {
-              core.debug('[CS] The SARIF file with CodeScan analysis results has been saved')
+    if (generateSarifFile) {
+      // We should always have single task, so it's enough to hardcode SERIF filename as codescan.sarif.
+      await Promise.all(
+          tasks.map(task => {
+            core.debug('[CS] Downloading SARIF file for Report Task: ' + task.id);
+            Request.get(codeScanUrl, authToken, '/_codescan/analysis/reports/' + task.id, false, {
+              'format': 'sarif',
+              'projectKey': core.getInput('projectKey')
+            }).then(data => {
+              fs.writeFile('codescan.sarif', data, () => {
+                core.debug('[CS] The SARIF file with CodeScan analysis results has been saved')
+              });
             });
-          });
-        })
-    );
+          })
+      );
+    } else {
+      core.debug('[CS] Generation of SARIF file is disabled.')
+    }
   } catch (error) {
     core.setFailed(error.message)
   }
