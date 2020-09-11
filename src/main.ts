@@ -32,7 +32,7 @@ async function run(): Promise<void> {
 
     if (generateSarifFile) {
       Object.assign(options, {
-        'sonar.analysis.report.enabled': true,
+        'sonar.analysis.report.enabled': 'true',
         'sonar.analysis.report.type': 'sarif'
       });
     }

@@ -409,7 +409,7 @@ function run() {
             const generateSarifFile = core.getInput('generateSarifFile') === 'true';
             if (generateSarifFile) {
                 Object.assign(options, {
-                    'sonar.analysis.report.enabled': true,
+                    'sonar.analysis.report.enabled': 'true',
                     'sonar.analysis.report.type': 'sarif'
                 });
             }
