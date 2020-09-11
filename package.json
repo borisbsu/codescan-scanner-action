@@ -9,6 +9,7 @@
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
+    "lint-fix": "eslint --fix src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
     "dist": "npm run build && npm run package",
@@ -16,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/codescan-io/codescan-scanner-action.git"
   },
   "keywords": [
     "actions",

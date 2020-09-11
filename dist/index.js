@@ -26,29 +26,40 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(2186));
 const request = __importStar(__webpack_require__(8699));
 class Request {
-    static get(url, authToken, path, isJson, query) {
-        core.debug(`[CS] API GET: '${path}' with query "${JSON.stringify(query)}"`);
-        return new Promise((resolve, reject) => {
-            const options = {
-                auth: { user: authToken }
-            };
-            if (query) {
-                options.qs = query;
-                options.useQuerystring = true;
-            }
-            request.get(Object.assign({ method: 'GET', baseUrl: url, uri: path, json: isJson }, options), (error, response, body) => {
-                if (error) {
-                    return Request.logAndReject(reject, `[CS] API GET '${path}' failed, error was: ${JSON.stringify(error)}`);
+    get(url, authToken, path, isJson, query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            core.debug(`[CS] API GET: '${path}' with query "${JSON.stringify(query)}"`);
+            return new Promise((resolve, reject) => {
+                const options = {
+                    auth: { user: authToken }
+                };
+                if (query) {
+                    options.qs = query;
+                    options.useQuerystring = true;
                 }
-                core.debug(`[CS] Response: ${response.statusCode} Body: "${Request.isString(body) ? body : JSON.stringify(body)}"`);
-                if (response.statusCode < 200 || response.statusCode >= 300) {
-                    return Request.logAndReject(reject, `[CS] API GET '${path}' failed, status code was: ${response.statusCode}`);
-                }
-                return resolve(body || (isJson ? {} : ''));
+                request.get(Object.assign({ method: 'GET', baseUrl: url, uri: path, json: isJson }, options), (error, response, body) => {
+                    if (error) {
+                        return Request.logAndReject(reject, `[CS] API GET '${path}' failed, error was: ${JSON.stringify(error)}`);
+                    }
+                    core.debug(`[CS] Response: ${response.statusCode} Body: "${Request.isString(body) ? body : JSON.stringify(body)}"`);
+                    if (response.statusCode < 200 || response.statusCode >= 300) {
+                        return Request.logAndReject(reject, `[CS] API GET '${path}' failed, status code was: ${response.statusCode}`);
+                    }
+                    return resolve(body || (isJson ? {} : ''));
+                });
             });
         });
     }
@@ -112,7 +123,7 @@ class Scanner {
     runAnalysis(serverUrl, token, options) {
         return __awaiter(this, void 0, void 0, function* () {
             core.debug(`[CS] Scanner options: ${JSON.stringify(options)}`);
-            yield this.doScan({
+            this.doScan({
                 serverUrl,
                 token,
                 options
@@ -149,6 +160,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -164,34 +184,42 @@ class Task {
         return this.task.id;
     }
     static waitForTaskCompletion(codeScanUrl, authToken, taskId, tries, delay = 1000) {
-        core.debug(`[CS] Waiting for task '${taskId}' to complete.`);
-        return Request_1.default.get(codeScanUrl, authToken, `/api/ce/task`, true, { id: taskId }).then(({ task }) => {
-            core.debug(`[CS] Task status:` + task.status);
-            if (tries <= 0) {
-                throw new TimeOutReachedError();
-            }
-            const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : '';
-            switch (task.status.toUpperCase()) {
-                case 'CANCEL':
-                case 'FAILED':
-                    throw new Error(`[CS] Task failed with status ${task.status}${errorInfo}`);
-                case 'SUCCESS':
-                    core.debug(`[CS] Task complete: ${JSON.stringify(task)}`);
-                    return new Task(task);
-                default:
-                    return new Promise((resolve, reject) => setTimeout(() => {
-                        Task.waitForTaskCompletion(codeScanUrl, authToken, taskId, tries, delay).then(resolve, reject);
-                        tries--;
-                    }, delay));
-            }
-        }, (err) => {
-            if (err && err.message) {
-                core.error(err.message);
-            }
-            else if (err) {
-                core.error(JSON.stringify(err));
-            }
-            throw new Error(`[CS] Could not fetch task for ID '${taskId}'`);
+        return __awaiter(this, void 0, void 0, function* () {
+            core.debug(`[CS] Waiting for task '${taskId}' to complete.`);
+            return new Request_1.default()
+                .get(codeScanUrl, authToken, `/api/ce/task`, true, {
+                id: taskId
+            })
+                .then(({ task }) => {
+                core.debug(`[CS] Task status:${task.status}`);
+                if (tries <= 0) {
+                    throw new TimeOutReachedError();
+                }
+                const errorInfo = task.errorMessage
+                    ? `, Error message: ${task.errorMessage}`
+                    : '';
+                switch (task.status.toUpperCase()) {
+                    case 'CANCEL':
+                    case 'FAILED':
+                        throw new Error(`[CS] Task failed with status ${task.status}${errorInfo}`);
+                    case 'SUCCESS':
+                        core.debug(`[CS] Task complete: ${JSON.stringify(task)}`);
+                        return new Task(task);
+                    default:
+                        return new Promise((resolve, reject) => setTimeout(() => {
+                            Task.waitForTaskCompletion(codeScanUrl, authToken, taskId, tries, delay).then(resolve, reject);
+                            tries--;
+                        }, delay));
+                }
+            }, (err) => {
+                if (err && err.message) {
+                    core.error(err.message);
+                }
+                else if (err) {
+                    core.error(JSON.stringify(err));
+                }
+                throw new Error(`[CS] Could not fetch task for ID '${taskId}'`);
+            });
         });
     }
 }
@@ -245,8 +273,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.REPORT_TASK_NAME = void 0;
 const fs = __importStar(__webpack_require__(5630));
 const core = __importStar(__webpack_require__(2186));
+const glob = __importStar(__webpack_require__(8090));
 const Task_1 = __importStar(__webpack_require__(9010));
-const glob = __webpack_require__(8090);
 exports.REPORT_TASK_NAME = 'report-task.txt';
 class TaskReport {
     constructor(report) {
@@ -276,7 +304,9 @@ class TaskReport {
     }
     static findTaskFileReport() {
         return __awaiter(this, void 0, void 0, function* () {
-            const globber = yield glob.create('**/' + exports.REPORT_TASK_NAME, { followSymbolicLinks: false });
+            const globber = yield glob.create(`**/${exports.REPORT_TASK_NAME}`, {
+                followSymbolicLinks: false
+            });
             return globber.glob();
         });
     }
@@ -324,12 +354,12 @@ class TaskReport {
     static createTaskReportFromString(fileContent) {
         const lines = fileContent.replace(/\r\n/g, '\n').split('\n'); // proofs against xplat line-ending issues
         const settings = new Map();
-        lines.forEach((line) => {
+        for (const line of lines) {
             const splitLine = line.split('=');
             if (splitLine.length > 1) {
                 settings.set(splitLine[0], splitLine.slice(1, splitLine.length).join('='));
             }
-        });
+        }
         return settings;
     }
     static throwMissingField(field) {
@@ -423,11 +453,13 @@ function run() {
             if (generateSarifFile) {
                 // We should always have single task, so it's enough to hardcode SERIF filename as codescan.sarif.
                 yield Promise.all(tasks.map(task => {
-                    core.debug('[CS] Downloading SARIF file for Report Task: ' + task.id);
-                    Request_1.default.get(codeScanUrl, authToken, '/_codescan/analysis/reports/' + task.id, false, {
-                        'format': 'sarif',
-                        'projectKey': core.getInput('projectKey')
-                    }).then(data => {
+                    core.debug(`[CS] Downloading SARIF file for Report Task: ${task.id}`);
+                    new Request_1.default()
+                        .get(codeScanUrl, authToken, `/_codescan/analysis/reports/${task.id}`, false, {
+                        format: 'sarif',
+                        projectKey: core.getInput('projectKey')
+                    })
+                        .then(data => {
                         fs.writeFile('codescan.sarif', data, () => {
                             core.debug('[CS] The SARIF file with CodeScan analysis results has been saved');
                         });

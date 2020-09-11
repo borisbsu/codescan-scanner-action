@@ -1,5 +1,5 @@
-import * as core from '@actions/core';
-import Request from "./Request";
+import * as core from '@actions/core'
+import Request from './Request'
 
 interface ITask {
   id: string
@@ -24,60 +24,73 @@ interface ITask {
 }
 
 export default class Task {
-  constructor(private readonly task: ITask) {
+  constructor(private readonly task: ITask) {}
+
+  get id(): string {
+    return this.task.id
   }
 
-  public get id() {
-    return this.task.id;
-  }
-
-  public static waitForTaskCompletion(
-      codeScanUrl: string,
-      authToken: string,
-      taskId: string,
-      tries: number,
-      delay = 1000
+  static async waitForTaskCompletion(
+    codeScanUrl: string,
+    authToken: string,
+    taskId: string,
+    tries: number,
+    delay = 1000
   ): Promise<Task> {
-    core.debug(`[CS] Waiting for task '${taskId}' to complete.`);
-    return Request.get(codeScanUrl, authToken, `/api/ce/task`, true, {id: taskId}).then(
-        ({task}: { task: ITask }) => {
-          core.debug(`[CS] Task status:` + task.status);
+    core.debug(`[CS] Waiting for task '${taskId}' to complete.`)
+    return new Request()
+      .get(codeScanUrl, authToken, `/api/ce/task`, true, {
+        id: taskId
+      })
+      .then(
+        ({task}: {task: ITask}) => {
+          core.debug(`[CS] Task status:${task.status}`)
           if (tries <= 0) {
-            throw new TimeOutReachedError();
+            throw new TimeOutReachedError()
           }
-          const errorInfo = task.errorMessage ? `, Error message: ${task.errorMessage}` : '';
+          const errorInfo = task.errorMessage
+            ? `, Error message: ${task.errorMessage}`
+            : ''
           switch (task.status.toUpperCase()) {
             case 'CANCEL':
             case 'FAILED':
-              throw new Error(`[CS] Task failed with status ${task.status}${errorInfo}`);
+              throw new Error(
+                `[CS] Task failed with status ${task.status}${errorInfo}`
+              )
             case 'SUCCESS':
-              core.debug(`[CS] Task complete: ${JSON.stringify(task)}`);
-              return new Task(task);
+              core.debug(`[CS] Task complete: ${JSON.stringify(task)}`)
+              return new Task(task)
             default:
               return new Promise<Task>((resolve, reject) =>
-                  setTimeout(() => {
-                    Task.waitForTaskCompletion(codeScanUrl, authToken, taskId, tries, delay).then(resolve, reject);
-                    tries--;
-                  }, delay)
-              );
+                setTimeout(() => {
+                  Task.waitForTaskCompletion(
+                    codeScanUrl,
+                    authToken,
+                    taskId,
+                    tries,
+                    delay
+                  ).then(resolve, reject)
+                  tries--
+                }, delay)
+              )
           }
         },
         (err: Error) => {
           if (err && err.message) {
-            core.error(err.message);
+            core.error(err.message)
           } else if (err) {
-            core.error(JSON.stringify(err));
+            core.error(JSON.stringify(err))
           }
-          throw new Error(`[CS] Could not fetch task for ID '${taskId}'`);
+          throw new Error(`[CS] Could not fetch task for ID '${taskId}'`)
         }
-    );
+      )
   }
 }
 
 export class TimeOutReachedError extends Error {
   constructor() {
-    super();
+    super()
     // Set the prototype explicitly.
-    Object.setPrototypeOf(this, TimeOutReachedError.prototype);
+    Object.setPrototypeOf(this, TimeOutReachedError.prototype)
   }
 }
