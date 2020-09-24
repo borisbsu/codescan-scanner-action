@@ -11,7 +11,7 @@ export class Scanner {
     options: object
   ): Promise<void> {
     core.debug(`[CS] Scanner options: ${JSON.stringify(options)}`)
-    await this.doScan({
+    this.doScan({
       serverUrl,
       token,
       options

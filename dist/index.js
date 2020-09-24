@@ -123,7 +123,7 @@ class Scanner {
     runAnalysis(serverUrl, token, options) {
         return __awaiter(this, void 0, void 0, function* () {
             core.debug(`[CS] Scanner options: ${JSON.stringify(options)}`);
-            yield this.doScan({
+            this.doScan({
                 serverUrl,
                 token,
                 options
