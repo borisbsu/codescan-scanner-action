@@ -1,6 +1,9 @@
-name: 'Your name here'
+name: 'Test Action'
 description: 'Provide a description here'
 author: 'Your name or organization here'
+branding:
+  icon: code
+  color: 'blue'
 inputs:
   organization:
     required: true
